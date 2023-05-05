@@ -1,54 +1,71 @@
+import { FC, memo, SyntheticEvent, useEffect, useState } from "react";
 
-import styles from './rating.module.scss'
-import { AiFillStar } from 'react-icons/ai'
-import classNames from 'classnames'
+import classNames from "classnames";
+
+import styles from "./rating.module.scss";
+import { Rating as MURaring } from "@mui/material";
 
 interface IProps {
-    rate: number,
-    count?: number,
-    size?: string
+  rate?: number;
+  size?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
+  noRatingGiven?: boolean;
+  onChange?: (value: number | null) => void;
+  style?: any;
 }
 
-const Rating: React.FC<IProps> = ({rate, count, size}) => {
-    return (
-        <div className={styles.rating}>
-            <div className={styles.rating__rate}>
-                <div className={classNames({
-                    [styles.rating__stars]: true,
-                    [styles.stars__small]: size === 'small',
-                    [styles.stars__full]: size !== 'small'
-                })}>
-                    {renderStars()}
-                </div>
-                {size !== 'small' && (
-                    <div className={styles.rating__value}>
-                        ({rate})
-                    </div>
-                )}
-                
-            </div>
-            {count && size !== 'small' && (
-                <div className={styles.rating__count}>
-                    {count}
-                </div>
-            )}
-        </div>
-    )
+const Rating: FC<IProps> = memo(
+  ({
+    rate = 0,
+    size,
+    readOnly = true,
+    disabled = false,
+    noRatingGiven = false,
+    onChange,
+    style,
+  }) => {
+    const [value, setValue] = useState<number | null>(rate);
 
+    function onRate(
+      event: SyntheticEvent<Element, Event>,
+      newValue: number | null
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
 
-    function renderStars(): React.ReactNode[] {
-        const stars: React.ReactNode[] = [];
-
-        for (let i = 1; i <= 5; i++) {
-            stars.push(
-                <div className={i <= Math.floor(rate) ? styles.gold : ''}>
-                    <AiFillStar />
-                </div>
-            )
-        }
-
-        return stars;
+      if (value !== newValue) {
+        setValue(newValue);
+      }
     }
-}
 
-export default Rating
+    useEffect(() => {
+      if (onChange) {
+        onChange(value);
+      }
+    }, [value]);
+
+    return (
+      <div
+        className={classNames({
+          [styles.rating__stars]: true,
+          [styles.stars__small]: size === "small",
+          [styles.stars__full]: size !== "small",
+        })}
+        style={style}
+      >
+        <MURaring
+          name="rating"
+          value={noRatingGiven ? null : rate}
+          onChange={onRate}
+          readOnly={readOnly}
+          disabled={disabled}
+        />
+      </div>
+    );
+  }
+);
+
+Rating.displayName = "Rating";
+
+export default Rating;

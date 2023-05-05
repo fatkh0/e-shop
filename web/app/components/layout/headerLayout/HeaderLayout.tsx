@@ -1,40 +1,23 @@
+import { FC, memo } from "react";
 
-
-
-import Container from '@/app/components/layout/container/Container'
-import SearchProduct from '@/app/components/ui/searchProduct/SearchProduct'
-import Logo from '@/app/components/shared/logo/Logo'
-
-import styles from './headerLayout.module.scss'
-import HeadButton from '../../ui/headButton/HeadButton'
-import Navbar from '../../ui/navbar/Navbar'
-
-
+import Header from "@/app/components/ui/header/Header";
+import { Container } from "@mui/material";
 
 interface IProps {
-    children: React.ReactNode,
-    contentPage?: string
+  children: React.ReactNode;
 }
 
-const HeaderLayout: React.FC<IProps> = ({children, contentPage}) => {
-    return (
-        <div className={styles.headerLayout}>
-            <div className={styles.headerLayout__ribbon}>
-                <Logo color='white' />
-                { contentPage === 'home' && <SearchProduct />}
-                <Navbar />
-            </div>
-            <div  className={styles.headerLayout__content}>
-                <Container>
-                    {children}
-                </Container>
-            </div>
-        </div>
-    )
-}
+const HeaderLayout: FC<IProps> = memo(({ children }) => {
+  return (
+    <>
+      <Header />
+      <Container sx={{mt: 8, pt: 1}}>
+        {children}
+      </Container>
+    </>
+  );
+});
 
+HeaderLayout.displayName = "HeaderLayout";
 
-
-
-
-export default HeaderLayout
+export default HeaderLayout;

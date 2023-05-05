@@ -1,33 +1,25 @@
-import { useRouter } from 'next/router'
+import { FC, memo, useContext } from "react";
 
-import { useGetProductQuery } from '@/app/store/product/product.api';
-import Preloader from '@/app/components/shared/preloader/Preloader';
-import ProductInfo from '@/app/components/ui/productPage/ProductPage';
-import HeaderLayout from '../../layout/headerLayout/HeaderLayout';
+import { RoleContext } from "@/app/providers/roleContextProvider";
 
-const ProductPage: React.FC = () => {
+import AdminProductInfo from "@/app/components/pages/productPage/AdminProductInfo";
+import ProductInfo from "@/app/components/pages/productPage/ProductInfo";
+import { IProduct } from "@/app/types/product.type";
 
-    const router = useRouter()
-    const { pid } = router.query
-
-    const {data, isLoading, error} = useGetProductQuery(Number(pid))
-
-    if (isLoading) {
-        return  <Preloader />
-    }
-
-    if (!data) {
-        router.push("/404")
-
-        return null
-    }
-
-    return (
-        <HeaderLayout>
-                <ProductInfo {...data} />
-        </HeaderLayout>
-    )
-
+interface IProps {
+  product: IProduct;
 }
 
-export default ProductPage
+const ProductScreen: FC<IProps> = memo(({ product }) => {
+  const { isAdmin } = useContext(RoleContext);
+
+  return isAdmin ? (
+    <AdminProductInfo {...product} />
+  ) : (
+    <ProductInfo {...product} />
+  );
+});
+
+ProductScreen.displayName = "ProductScreen";
+
+export default ProductScreen;

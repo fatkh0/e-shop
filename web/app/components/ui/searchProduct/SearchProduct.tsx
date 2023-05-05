@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import { useRef } from 'react'
-import { FaSearch } from 'react-icons/fa'
+import { useEffect, FC, memo, useContext, useCallback } from "react";
 
-import style from './searchProduct.module.scss'
+import { searchProductData } from "./searchProduct.data";
 
-const placeholder = 'Zboží, výrobce, hodnocení ...'
+import { getLoweredLetters } from "@/app/utils/getLoweredLetters";
+import { InputBase, Paper } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
 
-const SearchProduct: React.FC = () => {
-    const inputRef = useRef(null)
+import SearchIcon from "./SearchIcon";
+import { UrlSearchParamsContext } from "@/app/providers/urlSearchParamsProvider";
 
-    const [value, setValue] = useState('')
+const SearchProduct: FC = memo(() => {
+  const { getParam, setParam } = useContext(UrlSearchParamsContext);
+  const { uid, placeholder, ariaLabel } = searchProductData;
 
-    return (
-        <div className={style.searchProduct}>
-            <input
-                className={style.searchProduct__input}
-                placeholder={placeholder}
-                ref={inputRef}
-                value={value}
-                onInput={inputHandler}
-                />
-                <div className={style.searchProduct__icon}>
-                    <FaSearch />
-                </div>
-        </div>
-    )
+  const { control, reset, watch, getValues } = useForm({
+    defaultValues: {
+      [uid]: getParam(uid),
+    },
+  });
 
+  const setUrlParams = useCallback(
+    (text: string) => {
+      setParam(uid, getLoweredLetters(text));
+    },
+    [uid]
+  );
 
-    function inputHandler(event: React.ChangeEvent<HTMLInputElement>): void {
-        setValue(event.target.value)
-    }
-}
+  useEffect(() => {
+    const subscription = watch((value) => {
+      setUrlParams(value[uid]?.toString() ?? "");
+    });
 
-export default SearchProduct
+    return () => subscription.unsubscribe();
+  }, [watch, uid]);
+
+  function resetSearchBar() {
+    reset({ [uid]: "" });
+  }
+
+  return (
+    <Paper
+      component="form"
+      sx={{
+        p: "2px 4px",
+        display: "flex",
+        alignItems: "center",
+        width: "100%",
+        mb: 2,
+      }}
+    >
+      <Controller
+        control={control}
+        name={uid}
+        render={({ field }) => (
+          <>
+            <InputBase
+              {...field}
+              sx={{ ml: 1, flex: 1 }}
+              placeholder={placeholder}
+              inputProps={{ "aria-label": ariaLabel }}
+            />
+            <SearchIcon
+              value={getValues(uid)?.toString() ?? ""}
+              onClose={resetSearchBar}
+            />
+          </>
+        )}
+      />
+    </Paper>
+  );
+});
+
+SearchProduct.displayName = "SearchProduct";
+
+export default SearchProduct;

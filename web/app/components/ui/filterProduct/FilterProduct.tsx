@@ -1,64 +1,56 @@
-import { useState } from "react"
-import FilterDropdown from "@/app/components/shared/dropdown/dropdown"
-import Indent from "@/app/components/shared/indent/Indent"
-import Slider from "@/app/components/shared/slider/Slider"
-import List from "@/app/components/ui/select/Select"
+import { FC, memo, useContext } from "react";
 
-import styles from './filterProduct.module.scss'
-import Select from "@/app/components/ui/select/Select"
-import { useGetCategoriesQuery } from "@/app/store/product/product.api"
-import ScrollableList from "../../shared/scrollableList/ScrollableList"
+import { filterProductData } from "./filterProduct.data";
 
-const FilterProduct: React.FC = () => {
+import Dropdown from "@/app/components/shared/dropdown/Dropdown";
+import ScrollableList from "@/app/components/shared/scrollableList/ScrollableList";
+import Slider from "@/app/components/shared/formFields/slider/Slider";
+import Radio from "@/app/components/shared/formFields/radio/Radio";
 
-    const [category, setCategory] = useState()
+import styles from "./filterProduct.module.scss";
+import { ManufacturerContext } from "@/app/providers/manufacturerContextProvider";
+import { CategoryContext } from "@/app/providers/categoryContextProvider";
 
-    const {data, isLoading, error} = useGetCategoriesQuery();
+const FilterProduct: FC = memo(() => {
+  const { manufacturers } = useContext(ManufacturerContext);
+  const { categories } = useContext(CategoryContext);
 
-    return (
-        <aside className={styles.filterProduct}>
-            <div className={styles.filterProduct__inner}>
-                <FilterDropdown title='Category'>
-                    <ScrollableList maxHeight={300} options={data?.map(t => ({text: t}))}/>
-                </FilterDropdown>
+  const { defaultValues } = filterProductData;
 
+  return (
+    <aside className={styles.filterProduct}>
+      <div className={styles.filterProduct__inner}>
+        <Dropdown title={defaultValues.category.title}>
+          <ScrollableList {...defaultValues.category} options={categories} />
+        </Dropdown>
 
-                <FilterDropdown title='Price'>
-                    <>
-                        <Slider uid='price' />
-                    </>
-                </FilterDropdown>
+        <Dropdown title={defaultValues.price.title}>
+          <Slider {...defaultValues.price} />
+        </Dropdown>
 
+        <Dropdown title={defaultValues.manufacturer.title}>
+          <ScrollableList
+            {...defaultValues.manufacturer}
+            options={manufacturers}
+          />
+        </Dropdown>
 
-                <FilterDropdown title='Weight'>
-                    <>
-                        <Slider uid='weight' />
-                    </>
-                </FilterDropdown>
-          
-                
+        <Dropdown title={defaultValues.weight.title}>
+          <Slider {...defaultValues.weight} />
+        </Dropdown>
 
-                <FilterDropdown title='Brand'>
-                    <>
-                        <div>Brand</div>
-                    </>
-                </FilterDropdown>
+        <Dropdown title={defaultValues.rating.title}>
+          <Slider {...defaultValues.rating} />
+        </Dropdown>
 
+        <Dropdown title={defaultValues.inStock.title}>
+          <Radio {...defaultValues.inStock} />
+        </Dropdown>
+      </div>
+    </aside>
+  );
+});
 
-                <FilterDropdown title='Rating'>
-                    <>
-                        <Slider uid='rating' />
-                    </>
-                </FilterDropdown>
+FilterProduct.displayName = "FilterProduct";
 
-                <FilterDropdown title='In Stock'>
-                    <>
-                        <div>inStock</div>
-                    </>
-                </FilterDropdown>
-            </div>
-        </aside>
-    )
-}
-
-export default FilterProduct
+export default FilterProduct;

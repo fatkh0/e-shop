@@ -1,21 +1,37 @@
+import { Box, CircularProgress } from "@mui/material";
+import { FC, memo } from "react";
 
-import Image from 'next/image';
-import styles from './preloader.module.scss'
-
-const Preloader: React.FC = () => {
-
+const Preloader: FC = memo(() => {
   return (
-    <div className={styles.preloader}>
-        <Image
-          src='/preloader.svg'
-          alt='Loading...'
-          priority={true}
-          width={200}
-          height={100}
-         />
-    </div>
-    )
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        top: 0,
+        left: 0,
+        backgroundColor: "rgba(0,0,0,0.2)",
+      }}
+    >
+      <CircularProgress
+        style={{
+          width: "60px",
+          height: "60px",
+        }}
+        sx={{
+          "& svg": {
+            width: "60px",
+            height: "60px",
+          },
+        }}
+      />
+    </Box>
+  );
+});
 
-}
+Preloader.displayName = "Preloader";
 
-export default Preloader
+export default Preloader;

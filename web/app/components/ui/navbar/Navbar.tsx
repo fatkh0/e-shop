@@ -1,26 +1,37 @@
+import { FC, memo } from "react";
 
+import { navbarData } from "./navbar.data";
 
-import styles from './navbar.module.scss'
-import navbarItems from '@/app/data/navbar.json'
-import HeadButton from '../headButton/HeadButton'
+import { Typography } from "@mui/material";
+import Link from "next/link";
+import { capitalizeText } from "@/app/utils/capitalizeText";
+import AdminButton from "@/app/components/shared/button/adminButton/AdminButton";
 
+import styles from "./navbar.module.scss";
 
-const Navbar: React.FC = () => {
+const Navbar: FC = memo(() => {
+  return (
+    <nav className={styles.navbar}>
+      <ul className={styles.navbar__list}>
+        {navbarData.navLink.map((t) => (
+          <li key={t.link}>
+            <Link
+              href={{
+                pathname: t.link,
+              }}
+            >
+              <Typography variant="h6">{capitalizeText(t.name)}</Typography>
+            </Link>
+          </li>
+        ))}
+        <li>
+          <AdminButton />
+        </li>
+      </ul>
+    </nav>
+  );
+});
 
+Navbar.displayName = "Navbar";
 
-    return (
-        <nav className={styles.navbar}>
-            <ul  className={styles.navbar__list}>
-                {navbarItems?.map(t => (
-                    <li key={t.link}  className={styles.navbar__item}>
-                        <HeadButton link={t.link}>
-                            {t.name}
-                        </HeadButton>
-                    </li>
-                ))}
-            </ul>
-        </nav>
-    )
-}
-
-export default Navbar
+export default Navbar;
